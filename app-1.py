@@ -74,50 +74,37 @@ def recommendations(uid, num_recs=100):
 	
 	
 	
-		
-	
-	
-
-
-#   show a single todo item and lets you delete them
 class Todo(restful.Resource):
 	
 	@marshal_with(fields)
 	def get(self, user_id):
+		FK.g.db = connect_db()
 		if not len(str(uid)) == 5:
 			abort(404, message="{0} not a valid user id".format(uid))
+		return 	
 		return r0.get(uid)	
-		return TODOS[todo_id]
 
 
-	def delete(self, todo_id):
-		if not(len(TODOS) > todo_id > 0):
-			abort(404, message="Todo {} doesn't exist".format(todo_id))
-		TODOS[todo_id] = None
-		return "", 204
-
-# TodoList
-#  shows a list of all todos, and lets you POST to add new tasks
 parser = reqparse.RequestParser()
-parser.add_argument('task', type=str)
+parser.add_argument('rec', type=str)
 
 
-class TodoList(restful.Resource):
+class Rec(restful.Resource):
 	
 	@marshal_with(fields)
 	def get(self):
-		return TODOS
+		return Recs
 
 	def post(self):
 		args = parser.parse_args()
-		task = {'task': args['task']}
-		TODOS.append(task)
-		return marshal(task, fields), 201
+		task = {'rec': args['rec']}
+		recs.append(rec)
+		return marshal(hi_scores, fields), 201
 
 
-## Actually setup the Api resource routing here
+## configure the Api resource routing here
 api.add_resource(TodoList, '/todos')
-api.add_resource(Todo, '/todos/<int:todo_id>')
+api.add_resource(Rec, '/rec/<int:rec_id>')
 
 if __name__ == '__main__':
 	app.run(debug=True)
