@@ -1,6 +1,8 @@
 #!/usr/local/bin/python
 # encoding: utf-8
 
+# TODO: in similarity(), create cache
+
 
 from flask import Flask
 from flask.ext import restful
@@ -33,7 +35,6 @@ fields = {
 }
 
 
-
 def connect_db():
 	return redis(db=REDIS_DB, host=REDIS_HOST, port=PORT)
 
@@ -41,6 +42,11 @@ def connect_db():
 @app.before_request
 def before_request():
 	Flask.g.db = connect_db()
+
+
+def jaccard_prep(bitstr):
+	return NP.array( list(bitstr), dtype=int )
+
 
 def jaccard(vec1, vec2) :
     """
@@ -60,14 +66,27 @@ def jaccard(vec1, vec2) :
     return numer / denom
 
 
-# Todo
+def recommendations(uid, num_recs=100):
+	vec1 = jaccard_prep(r0.get(uid))
+	all_vecs = [ [jaccard_prep(r0.get(k)), int(k)] for k in r0.keys('*') ]
+	return sorted([[jaccard(vec1, row[0]), row[1]] for row in all_vecs],
+		reverse=True)[1:][:num_recs]
+	
+	
+	
+		
+	
+	
+
+
 #   show a single todo item and lets you delete them
 class Todo(restful.Resource):
 	
 	@marshal_with(fields)
-	def get(self, todo_id):
-		if not(len(TODOS) > todo_id > 0) or TODOS[todo_id] is None:
-			abort(404, message="Todo {} doesn't exist".format(todo_id))
+	def get(self, user_id):
+		if not len(str(uid)) == 5:
+			abort(404, message="{0} not a valid user id".format(uid))
+		return r0.get(uid)	
 		return TODOS[todo_id]
 
 
