@@ -66,8 +66,10 @@ def recommendations(uid, num_recs=100):
 class Trec(restful Resource):
 	
 	@marshal_with(fields)
-	def get(self):
-		return  
+	def get(self, uid):
+		db = FK.g.db
+		return  db.get(uid)
+
 
 
 
