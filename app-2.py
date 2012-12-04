@@ -4,13 +4,21 @@
 
 from flask import Flask
 from flask.ext import restful
+from flask import request, g
 from flask.ext.restful import (reqparse, abort, fields, marshal_with,
                                marshal)
-from redis import Redis as redis
+							   
+from tornado.wsgi import WSGIContainer
+from tornado.httpserver import HTTPServer
+from tornado.ioloop import IOLoop
+from yourapplication import app
+
+from redis import StrictRedis as redis
 from contextlib import closing
 import numpy as NP
 
-REDIS_DB = 2
+
+REDIS_DB = 0
 DEBUG = True
 SECRET_KEY = "!Erew9reQir549&3d394W*"
 USERNAME = None
@@ -24,6 +32,14 @@ api = restful.Api(app)
 parser = reqparse.RequestParser()
 parser.add_argument('rec', type=str)
 
+TODOS = {
+    'rec1': {'uid': '34567'},
+    'rec2': {'uid': '84309'},
+    'rec3': {'uid': '32865'},
+}
+
+r0 = redis(REDIS_DB, REDIS_HOST, PORT)
+
 
 def connect_db():
 	return redis(db=REDIS_DB, host=REDIS_HOST, port=PORT)
@@ -31,7 +47,7 @@ def connect_db():
 
 @app.before_request
 def before_request():
-	Flask.g.db = connect_db()
+	g.db = connect_db()
 
 
 def jaccard_prep(bitstr):
@@ -63,14 +79,32 @@ def recommendations(uid, num_recs=100):
 		reverse=True)[1:][:num_recs]
 
 
-class Trec(restful Resource):
+class Trec(restful.Resource):
 	
-	@marshal_with(fields)
 	def get(self, uid):
-		db = FK.g.db
-		return  db.get(uid)
+		tx = r0.get(uid)
+		# return {'rec1': tx}
+		return TODOS[uid]
 
 
 
+class Trec2(restful.Resource):
+	
+	def get(self):
+		return TODOS
 
+
+
+# the resources (one resource = one class)
+api.add_resource(Trec2, '/rec')
+api.add_resource(Trec, '/todos/<string:uid>')
+
+if __name__ == '__main__':
+	app.run(debug=True)
+	http_server = HTTPServer(WSGIContainer(app))
+	http_server.listen(5000)
+	IOLoop.instance().start()
+
+
+# to use, just curl at the endpoint to get a recommendation
 
