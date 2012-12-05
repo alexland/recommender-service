@@ -1,3 +1,4 @@
 *.graffle
 *.rdb
 .DS_Store
+*.pyc
