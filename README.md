@@ -23,6 +23,6 @@ to get a recommendation, just curl against an endpoint:
     ```sh
     curl http://my-recommender.com/home/ -d "45924"
     ```
-
+http://devimages.apple.com/downloads/xcode/command_line_tools_for_xcode_10_8_late_july_2012.dmg
 
 
