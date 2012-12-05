@@ -53,6 +53,12 @@ def jaccard(vec1, vec2) :
     denom = float(vec1.size)
     return numer / denom
 
+# 
+def recommendations(uid, num_recs=10):
+	vec1 = jaccard_prep(r0.get(uid))
+	all_vecs = [ [jaccard_prep(r0.get(k)), int(k)] for k in r0.keys('*') ]
+	return sorted([[jaccard(vec1, row[0]), row[1]] for row in all_vecs],
+		reverse=True)[1:][:num_recs]
 
 
 @app.route('/rec1')
