@@ -16,7 +16,10 @@
 * [RESTFUL routing is a nice way to implement "context"-dependence without requiring supplied parameters](#)
 
 
+#
 
+to get a recommendation, just curl against an endpoint:
+	curl http://my-recommender.com/home/ -d "45924"
 
 
 
