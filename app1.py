@@ -70,7 +70,7 @@ def jaccard(vec1, vec2) :
     return numer / denom
 
 
-def recommendations(uid, num_recs=10):
+def recommendations(uid, num_recs=100):
 	vec1 = jaccard_prep(r0.get(uid))
 	all_vecs = [ [jaccard_prep(r0.get(k)), int(k)] for k in r0.keys('*') ]
 	return sorted([[jaccard(vec1, row[0]), row[1]] for row in all_vecs],
