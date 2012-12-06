@@ -16,9 +16,9 @@
 * [RESTFUL routing is a nice way to implement "context"-dependence without requiring supplied parameters](#)
 
 
-#
+=======
 
-to get a recommendation, just curl against an endpoint:
+to get a recommendation, just *_curl_* against an endpoint:
 
     curl http://my-recommender.com/routebeer/route66?user_id=43563
 
