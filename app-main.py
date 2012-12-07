@@ -5,6 +5,7 @@ from __future__ import absolute_import
 import os
 import sys
 import flask as FK
+from flask import g
 from flask import url_for
 from flask import request
 from contextlib import closing
@@ -29,7 +30,12 @@ def connect_db():
 
 @app.before_request
 def before_request():
-	FK.g.db = connect_db()
+	g.db = connect_db()
+
+
+# @app.teardown_request
+# def teardown_request(exception):
+# 	g.db.close()
 
 
 def jaccard_prep(bitstr):
@@ -49,14 +55,14 @@ def jaccard(vec1, vec2) :
     try :
         numer = NP.sum(vec1 == vec2)
     except ValueError :
-        print("check that the 2 vectors are of equal length")
+        print("check that the two vectors are of equal length")
     denom = float(vec1.size)
     return numer / denom
 
 
-def recommendations(uid, num_recs=10):
-	vec1 = jaccard_prep(r0.get(uid))
-	all_vecs = [ [jaccard_prep(r0.get(k)), int(k)] for k in r0.keys('*') ]
+def recommendations(user_id, num_recs=10):
+	vec1 = jaccard_prep(g.db.get(user_id))
+	all_vecs = [ [jaccard_prep(g.db.get(k)), int(k)] for k in g.db.keys('*') ]
 	return sorted([[jaccard(vec1, row[0]), row[1]] for row in all_vecs],
 		reverse=True)[1:][:num_recs]
 
@@ -67,12 +73,12 @@ def api_jaccard():
 		return "no valid user id supplied"
 	else:	 
 		k1 = request.args['user_id']
-		recommendations(k1, )
-		k2 = FK.g.db.randomkey()
-		v12 = FK.g.db.mget([k1, k2])
-		v12 = map(jaccard_prep, v12)
-		score = jaccard(*v12)
-		return "pair-wise score is: {0}".format(score)
+		ji = recommendations(k1)
+		r = FK.jsonify(recs=ji)
+		r.status_code = 200
+		return r
+
+		
 	
 
 
