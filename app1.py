@@ -1,6 +1,10 @@
 #!/usr/local/bin/python
 # encoding: utf-8
 
+"""
+to use: curl -i http://127.0.0.1:5000/jaccard?user_id=12896
+"""
+
 # TODO: in similarity(), create cache
 
 
