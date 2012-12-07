@@ -4,3 +4,5 @@
 2. siege-type load/stress testing
 
 3. add exception handling to main api method
+
+4. passing in multiple params for GET
