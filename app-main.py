@@ -61,10 +61,13 @@ def recommendations(uid, num_recs=10):
 		reverse=True)[1:][:num_recs]
 
 
-@app.route('/rec1')
-def api_rec1():
-	if 'user_id' in request.args:
+@app.route('/jaccard')
+def api_jaccard():
+	if  not 'user_id' in request.args:
+		return "no valid user id supplied"
+	else:	 
 		k1 = request.args['user_id']
+		recommendations(k1, )
 		k2 = FK.g.db.randomkey()
 		v12 = FK.g.db.mget([k1, k2])
 		v12 = map(jaccard_prep, v12)
