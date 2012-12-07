@@ -11,10 +11,7 @@ from contextlib import closing
 from redis import StrictRedis as redis
 import numpy as NP
 
-app = FK.Flask(__name__)
-app.config.from_object(__name__)
-
-REDIS_DB = 0
+DATABASE = 0
 DEBUG = True
 SECRET_KEY = '!Erew9reQir549&3d394W*'
 USERNAME = None
@@ -22,9 +19,12 @@ PASSWORD = None
 REDIS_HOST = 'localhost'
 PORT = 6379
 
+app = FK.Flask(__name__)
+app.config.from_object(__name__)
+
 
 def connect_db():
-	return redis(db=REDIS_DB, host=REDIS_HOST, port=PORT)
+	return redis(db=DATABASE, host=REDIS_HOST, port=PORT)
 
 
 @app.before_request
@@ -53,7 +53,7 @@ def jaccard(vec1, vec2) :
     denom = float(vec1.size)
     return numer / denom
 
-# 
+
 def recommendations(uid, num_recs=10):
 	vec1 = jaccard_prep(r0.get(uid))
 	all_vecs = [ [jaccard_prep(r0.get(k)), int(k)] for k in r0.keys('*') ]
