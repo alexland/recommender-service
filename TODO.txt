@@ -1,0 +1,6 @@
+
+1. tests via 
+
+2. siege-type load/stress testing
+
+3. add exception handling to main api method
