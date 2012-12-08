@@ -1,6 +1,19 @@
 #!/usr/local/bin/python
 # encoding: utf-8
 
+"""
+to use, just curl against one of the endpoints, like so:
+
+url http://127.0.0.1:5000/jaccard?user_id=12896 
+
+to get the headers, pass in '-i'
+
+to redirect the output to a file:
+
+url http://127.0.0.1:5000/jaccard?user_id=12896 | cat > t1.json
+
+"""
+
 from __future__ import absolute_import
 import os
 import sys
