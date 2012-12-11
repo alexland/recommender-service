@@ -20,6 +20,7 @@ from contextlib import closing
 from redis import StrictRedis as redis
 import numpy as NP
 from jaccard import recommender
+from cosine
 
 DATABASE = 0
 DEBUG = True
@@ -51,7 +52,7 @@ def api_jaccard():
 		vec1 = fnx(g.db.get(user_id))
 		all_vecs = [ [fnx(g.db.get(k)), int(k)] for k in g.db.keys('*') ]
 		ji = sorted([[recommender(vec1, row[0]), row[1]] for row in all_vecs],
-				reverse=True)[1:][:num_recs]
+				reverse=True)[::100]
 		r = FK.jsonify(recs=ji)
 		r.status_code = 200
 		return r
