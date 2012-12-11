@@ -15,7 +15,7 @@
 
 * [RESTFUL routing is a nice way to implement "context"-dependence without requiring supplied parameters](#)
 
-==
+======
 
 to get a recommendation, just *_curl_* against an endpoint:
 
