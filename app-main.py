@@ -1,6 +1,8 @@
 #!/usr/local/bin/python
 # encoding: utf-8
 
+# TODO: create new redis DB for pearson
+
 """
 to use, just curl against one of the endpoints, like so:
 curl http://127.0.0.1:5000/jaccard?user_id=12896
@@ -58,8 +60,15 @@ def api_jaccard():
 		return r
 
 
-# @app.route('/freq_itemsets')
-# def api_freq_itemsets():
+@app.route('/pearson')
+def api_pearson():
+	if  not 'user_id' in request.args:
+		return "no valid user id supplied"
+	else:
+		num_recs = 10
+		user_id = request.args['user_id']
+		fnx = lambda q: NP.array( list(q), dtype=float )
+
 
 
 if __name__ == '__main__':
