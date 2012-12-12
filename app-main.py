@@ -21,8 +21,6 @@ from flask import request
 from contextlib import closing
 from redis import StrictRedis as redis
 import numpy as NP
-from jaccard import recommender
-from cosine
 
 DATABASE = 0
 DEBUG = True
@@ -42,6 +40,34 @@ def connect_db():
 @app.before_request
 def before_request():
 	g.db = connect_db()
+
+
+def recommender(jaccard=1, pearson=0):
+	"""
+		generic code for similarity-metric-based recommendation
+		endpoints;
+		returns json array comprised of user ids & similarity
+		score based on pair-wise calc w/ client user id;
+		pass in user id
+	"""
+	if  not 'user_id' in request.args:
+		return "no valid user id supplied"
+	else:
+		if jaccard:
+			from jaccard import recommender
+		else:
+			from pearson import recommender
+		num_recs = 10
+		user_id = request.args['user_id']
+		fnx = lambda q: NP.array( list(q), dtype=int )
+		vec1 = fnx(g.db.get(user_id))
+		all_vecs = [ [fnx(g.db.get(k)), int(k)] for k in g.db.keys('*') ]
+		ji = sorted([[recommender(vec1, row[0]), row[1]] for row in all_vecs],
+				reverse=True)[::100]
+		r = FK.jsonify(recs=ji)
+		r.status_code = 200
+		return r
+
 
 @app.route('/jaccard')
 def api_jaccard():
@@ -68,6 +94,13 @@ def api_pearson():
 		num_recs = 10
 		user_id = request.args['user_id']
 		fnx = lambda q: NP.array( list(q), dtype=float )
+		vec1 = fnx(g.db.get(user_id))
+		all_vecs = [ [fnx(g.db.get(k)), int(k)] for k in g.db.keys('*') ]
+		ji = sorted([[recommender(vec1, row[0]), row[1]] for row in all_vecs],
+				reverse=True)[::100]
+		r = FK.jsonify(recs=ji)
+		r.status_code = 200
+		return r
 
 
 
