@@ -1,9 +1,6 @@
 #!/usr/local/bin/python
 # encoding: utf-8
 
-import os
-import sys
-from redis import StrictRedis as redis
 import numpy as NP
 
 

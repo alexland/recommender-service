@@ -42,6 +42,7 @@ def before_request():
 	g.db = connect_db()
 
 
+
 def recommender(jaccard=1, pearson=0):
 	"""
 		generic code for similarity-metric-based recommendation
@@ -57,16 +58,16 @@ def recommender(jaccard=1, pearson=0):
 			from jaccard import recommender
 		else:
 			from pearson import recommender
-		num_recs = 10
-		user_id = request.args['user_id']
-		fnx = lambda q: NP.array( list(q), dtype=int )
-		vec1 = fnx(g.db.get(user_id))
-		all_vecs = [ [fnx(g.db.get(k)), int(k)] for k in g.db.keys('*') ]
-		ji = sorted([[recommender(vec1, row[0]), row[1]] for row in all_vecs],
-				reverse=True)[::100]
-		r = FK.jsonify(recs=ji)
-		r.status_code = 200
-		return r
+	num_recs = 10
+	user_id = request.args['user_id']
+	fnx = lambda q: NP.array( list(q), dtype=int )
+	v1 = fnx(g.db.get(user_id))
+	all_vecs = [ [fnx(g.db.get(k)), int(k)] for k in g.db.keys('*') ]
+	ji = sorted([[recommender(v1, row[0]), row[1]] for row in all_vecs],
+			reverse=True)[::100]
+	r = FK.jsonify(recs=ji)
+	r.status_code = 200
+	return r
 
 
 @app.route('/jaccard')
@@ -74,12 +75,14 @@ def api_jaccard():
 	if  not 'user_id' in request.args:
 		return "no valid user id supplied"
 	else:
+		from jaccard import recommender
 		num_recs = 10
 		user_id = request.args['user_id']
 		fnx = lambda q: NP.array( list(q), dtype=int )
-		vec1 = fnx(g.db.get(user_id))
-		all_vecs = [ [fnx(g.db.get(k)), int(k)] for k in g.db.keys('*') ]
-		ji = sorted([[recommender(vec1, row[0]), row[1]] for row in all_vecs],
+		v1 = fnx(g.db.get(user_id)[:25])
+		all_vecs = [ [fnx( g.db.get(k)[:25] ), int(k)] for k in g.db.keys('*') ]
+		fnx = lambda v: round(v, 3)
+		ji = sorted([[fnx(recommender(v1, row[0])), row[1]] for row in all_vecs],
 				reverse=True)[::100]
 		r = FK.jsonify(recs=ji)
 		r.status_code = 200
@@ -91,12 +94,14 @@ def api_pearson():
 	if  not 'user_id' in request.args:
 		return "no valid user id supplied"
 	else:
+		from pearson import recommender
 		num_recs = 10
 		user_id = request.args['user_id']
-		fnx = lambda q: NP.array( list(q), dtype=float )
-		vec1 = fnx(g.db.get(user_id))
-		all_vecs = [ [fnx(g.db.get(k)), int(k)] for k in g.db.keys('*') ]
-		ji = sorted([[recommender(vec1, row[0]), row[1]] for row in all_vecs],
+		v1 = map(float, g.db.get(user_id).split('X')[1].split('|'))
+		all_vecs = [ [map(float, g.db.get(k).split('X')[1].split('|')),
+			int(k)] for k in g.db.keys('*') ]
+		fnx = lambda v: round(v, 3)
+		ji = sorted([[fnx(recommender(v1, row[0])), row[1]] for row in all_vecs],
 				reverse=True)[::100]
 		r = FK.jsonify(recs=ji)
 		r.status_code = 200
