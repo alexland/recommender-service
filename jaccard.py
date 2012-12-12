@@ -6,10 +6,9 @@ import numpy as NP
 
 def recommender(v1, v2) :
     """
-        returns Jaccard Index for 2 bit-wise vtors;
-        pass in 2 x NumPy 1D arrays (type is int/float/boolean,
-		if former 2;
-        values of 0, 1 only ) of *equal* size
+    returns Jaccard Index for 2 bit-wise vectors;
+    pass in 2 x NumPy 1D arrays (any dtype);
+    but values are {0,1}, and len(v1) == len(v2)
     """
     v1, v2 = NP.squeeze(v1), NP.squeeze(v2)
     fnx = lambda v : NP.array(v, dtype=bool)
