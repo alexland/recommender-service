@@ -14,6 +14,7 @@ curl http://127.0.0.1:5000/jaccard?user_id=12896 | cat > t1.json
 from __future__ import absolute_import
 import os
 import sys
+from math import floor
 import flask as FK
 from flask import g
 from flask import url_for
@@ -42,34 +43,6 @@ def before_request():
 	g.db = connect_db()
 
 
-
-def recommender(jaccard=1, pearson=0):
-	"""
-		generic code for similarity-metric-based recommendation
-		endpoints;
-		returns json array comprised of user ids & similarity
-		score based on pair-wise calc w/ client user id;
-		pass in user id
-	"""
-	if  not 'user_id' in request.args:
-		return "no valid user id supplied"
-	else:
-		if jaccard:
-			from jaccard import recommender
-		else:
-			from pearson import recommender
-	num_recs = 10
-	user_id = request.args['user_id']
-	fnx = lambda q: NP.array( list(q), dtype=int )
-	v1 = fnx(g.db.get(user_id))
-	all_vecs = [ [fnx(g.db.get(k)), int(k)] for k in g.db.keys('*') ]
-	ji = sorted([[recommender(v1, row[0]), row[1]] for row in all_vecs],
-			reverse=True)[::100]
-	r = FK.jsonify(recs=ji)
-	r.status_code = 200
-	return r
-
-
 @app.route('/jaccard')
 def api_jaccard():
 	if  not 'user_id' in request.args:
@@ -80,10 +53,10 @@ def api_jaccard():
 		user_id = request.args['user_id']
 		fnx = lambda q: NP.array( list(q), dtype=int )
 		v1 = fnx(g.db.get(user_id)[:25])
-		all_vecs = [ [fnx( g.db.get(k)[:25] ), int(k)] for k in g.db.keys('*') ]
+		all_vecs = [ [ fnx(g.db.get(k)[:25]), int(k) ] for k in g.db.keys('*') ]
 		fnx = lambda v: round(v, 3)
-		ji = sorted([[fnx(recommender(v1, row[0])), row[1]] for row in all_vecs],
-				reverse=True)[::100]
+		ji = [ [fnx(recommender(v1, row[0]) ), row[1]] for row in all_vecs ]
+		ji = sorted(ji, reverse=True)[1::500]
 		r = FK.jsonify(recs=ji)
 		r.status_code = 200
 		return r
@@ -101,8 +74,8 @@ def api_pearson():
 		all_vecs = [ [map(float, g.db.get(k).split('X')[1].split('|')),
 			int(k)] for k in g.db.keys('*') ]
 		fnx = lambda v: round(v, 3)
-		ji = sorted([[fnx(recommender(v1, row[0])), row[1]] for row in all_vecs],
-				reverse=True)[::100]
+		ji = [[fnx(recommender(v1, row[0])), row[1]] for row in all_vecs]
+		ji = sorted(ji, reverse=True)[1::500]
 		r = FK.jsonify(recs=ji)
 		r.status_code = 200
 		return r
