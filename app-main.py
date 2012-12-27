@@ -61,6 +61,9 @@ def api_jaccard():
 		r.status_code = 200
 		return r
 
+@app.route('/')
+def index():
+	FK.template(index.hmtl)
 
 @app.route('/pearson')
 def api_pearson():
