@@ -11,13 +11,13 @@
 
 * [ML models can be built & retrained outside of the main app's release cycle](#)
 
-* [the algorithm underlying the RE can be revised or replaced without change to the interface](#)
+* [the algorithm underlying the RE can be revised or replaced without change to the interface (it's a module import)](#)
 
 * [RESTFUL routing is a nice way to implement "context"-dependence without requiring supplied parameters](#)
 
 ======
 
-to get a recommendation, just *_curl_* against an endpoint:
+to get a recommendation, just *_curl_* at an endpoint:
 
     curl http://my-recommender.com/routebeer/route66?user_id=43563
 
